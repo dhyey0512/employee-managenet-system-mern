@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'http://44.207.70.34:8000/';
 
 export const GetAllEmployees = async (search = '', page = 1, limit = 5) => {
     const url =
