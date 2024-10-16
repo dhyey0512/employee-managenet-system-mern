@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { DeleteEmployeeById } from '../api';
 import { notify } from '../utils';
 
-
 function EmployeeTable({
-    employees, pagination,
-    fetchEmployees, handleUpdateEmployee }) {
+    employees = [], 
+    pagination = { currentPage: 1, totalPages: 1 }, // Set default values
+    fetchEmployees, 
+    handleUpdateEmployee 
+}) {
     const headers = ['Name', 'Email', 'Phone', 'Department', 'Actions'];
     const { currentPage, totalPages } = pagination;
 
@@ -21,56 +23,55 @@ function EmployeeTable({
             handlePagination(currentPage - 1);
         }
     };
-    const handlePagination = (currentPage) => {
-        fetchEmployees('', currentPage, 5)
-    }
+
+    const handlePagination = (page) => {
+        fetchEmployees('', page, 5);
+    };
 
     const handleDeleteEmployee = async (id) => {
         try {
             const { success, message } = await DeleteEmployeeById(id);
-            if (success) {
-                notify(message, 'success')
-            } else {
-                notify(message, 'error')
-            }
-            fetchEmployees();
+            notify(message, success ? 'success' : 'error');
+            fetchEmployees(); // Fetch the updated employee list
         } catch (err) {
             console.error(err);
-            notify('Failed to delete Employee', 'error')
+            notify('Failed to delete Employee', 'error');
         }
-    }
-
+    };
 
     const TableRow = ({ employee }) => {
-        return <tr>
-            <td>
-                <Link to={`/employee/${employee._id}`} className="text-decoration-none">
-                    {employee.name}
-                </Link>
-            </td>
-            <td>{employee.email}</td>
-            <td>{employee.phone}</td>
-            <td>{employee.department}</td>
-            <td>
-                <i
-                    className='bi bi-pencil-fill text-warning me-4'
-                    role="button"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    title="Edit"
-                    onClick={() => handleUpdateEmployee(employee)}
-                ></i>
-                <i
-                    className='bi bi-trash-fill text-danger'
-                    role="button"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    title="Delete"
-                    onClick={() => handleDeleteEmployee(employee._id)}
-                ></i>
-            </td>
-        </tr>
-    }
+        return (
+            <tr>
+                <td>
+                    <Link to={`/employee/${employee._id}`} className="text-decoration-none">
+                        {employee.name}
+                    </Link>
+                </td>
+                <td>{employee.email}</td>
+                <td>{employee.phone}</td>
+                <td>{employee.department}</td>
+                <td>
+                    <i
+                        className='bi bi-pencil-fill text-warning me-4'
+                        role="button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Edit"
+                        onClick={() => handleUpdateEmployee(employee)}
+                    ></i>
+                    <i
+                        className='bi bi-trash-fill text-danger'
+                        role="button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Delete"
+                        onClick={() => handleDeleteEmployee(employee._id)}
+                    ></i>
+                </td>
+            </tr>
+        );
+    };
+
     const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
 
     return (
@@ -78,20 +79,23 @@ function EmployeeTable({
             <table className='table table-striped'>
                 <thead>
                     <tr>
-                        {
-                            headers.map((header, i) => (
-                                <th key={i}>{header}</th>
-                            ))
-                        }
+                        {headers.map((header, i) => (
+                            <th key={i}>{header}</th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {
-                        employees.length === 0 ? <div> Data Not Found</div>
-                            : employees.map((emp) => (
-                                <TableRow employee={emp} key={emp._id} />
-                            ))
-                    }
+                    {employees.length === 0 ? (
+                        <tr>
+                            <td colSpan={headers.length} className="text-center">
+                                Data Not Found
+                            </td>
+                        </tr>
+                    ) : (
+                        employees.map((emp) => (
+                            <TableRow employee={emp} key={emp._id} />
+                        ))
+                    )}
                 </tbody>
             </table>
 
@@ -123,9 +127,8 @@ function EmployeeTable({
                     </button>
                 </div>
             </div>
-
         </>
-    )
+    );
 }
 
-export default EmployeeTable
+export default EmployeeTable;
