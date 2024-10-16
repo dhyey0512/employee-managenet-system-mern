@@ -16,7 +16,7 @@ RUN npm install
 COPY . .
 
 # Start the app
-CMD ["node", "index.js"]
+CMD ["nodemon", "index.js"]
 
 # Expose the port your app runs on
 EXPOSE 8000
